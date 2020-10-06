@@ -15,7 +15,7 @@ import java.util.HashSet;
  * @author: LiuHu
  * @create: 2020/10/6
  **/
-public class CatalogMapperDemo extends AbstractDemo {
+public class CrudMapperDemo extends AbstractDemo {
 
     public static void main(String[] args) {
         //createTable();

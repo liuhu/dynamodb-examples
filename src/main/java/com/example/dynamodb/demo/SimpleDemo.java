@@ -20,7 +20,7 @@ import java.util.*;
  * @author: LiuHu
  * @create: 2020/10/6
  **/
-public class TableDemo extends AbstractDemo {
+public class SimpleDemo extends AbstractDemo {
 
 
     public static void main(String[] args) throws Exception {
@@ -80,7 +80,7 @@ public class TableDemo extends AbstractDemo {
     private static void loadData() throws IOException {
         Table table = dynamoDB.getTable(tableName);
 
-        try (JsonParser parser = new JsonFactory().createParser(TableDemo.class.getClassLoader().getResourceAsStream("moviedata.json"))) {
+        try (JsonParser parser = new JsonFactory().createParser(SimpleDemo.class.getClassLoader().getResourceAsStream("moviedata.json"))) {
             JsonNode rootNode = new ObjectMapper().readTree(parser);
             Iterator<JsonNode> iter = rootNode.iterator();
             ObjectNode currentNode;
