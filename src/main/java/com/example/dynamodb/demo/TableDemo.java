@@ -4,9 +4,8 @@ import com.amazonaws.client.builder.AwsClientBuilder;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
 import com.amazonaws.services.dynamodbv2.document.*;
-import com.amazonaws.services.dynamodbv2.document.spec.DeleteItemSpec;
-import com.amazonaws.services.dynamodbv2.document.spec.GetItemSpec;
-import com.amazonaws.services.dynamodbv2.document.spec.UpdateItemSpec;
+import com.amazonaws.services.dynamodbv2.document.spec.*;
+import com.amazonaws.services.dynamodbv2.document.utils.NameMap;
 import com.amazonaws.services.dynamodbv2.document.utils.ValueMap;
 import com.amazonaws.services.dynamodbv2.model.*;
 import com.fasterxml.jackson.core.JsonFactory;
@@ -49,8 +48,14 @@ public class TableDemo {
 
 
 //        updateItem_Conditionally();
-        deleteItem();
-//         deleteTable();
+//        deleteItem();
+
+//        queryItem();
+        scanItem();
+
+//        deleteTable();
+
+
     }
 
     /**
@@ -240,5 +245,102 @@ public class TableDemo {
         table.deleteItem(deleteItemSpec);
         System.out.println("DeleteItem succeeded");
 
+    }
+
+    /**
+     * 查询数据
+     */
+    private static void queryItem() {
+        Table table = dynamoDB.getTable("Movies");
+
+        // nameMap 提供名称替换功能。
+        // 因为 year 是 Amazon DynamoDB 中的保留字, 不能直接在任何表达式中使用它, 用表达式属性名称 #yr 来解决此问题。
+        HashMap<String, String> nameMap = new HashMap<String, String>();
+        nameMap.put("#yr", "year");
+
+        // valueMap 提供值替换功能。
+        // 因为不能在任何表达式中使用文本。用表达式属性值 :yyyy 来解决此问题。
+        HashMap<String, Object> valueMap = new HashMap<String, Object>();
+        valueMap.put(":yyyy", 1985);
+
+        QuerySpec querySpec = new QuerySpec()
+                .withKeyConditionExpression("#yr = :yyyy")
+                .withNameMap(nameMap)
+                .withValueMap(valueMap);
+
+        ItemCollection<QueryOutcome> items = null;
+        Iterator<Item> iterator = null;
+        Item item = null;
+
+        try {
+            System.out.println("Movies from 1985");
+            items = table.query(querySpec);
+
+            iterator = items.iterator();
+            while (iterator.hasNext()) {
+                item = iterator.next();
+                System.out.println(item.getNumber("year") + ": " + item.getString("title"));
+            }
+
+        }
+        catch (Exception e) {
+            System.err.println("Unable to query movies from 1985");
+            System.err.println(e.getMessage());
+        }
+
+
+        valueMap.put(":yyyy", 1992);
+        valueMap.put(":letter1", "A");
+        valueMap.put(":letter2", "L");
+
+        querySpec.withProjectionExpression("#yr, title, info.genres, info.actors[0]")
+                .withKeyConditionExpression("#yr = :yyyy and title between :letter1 and :letter2")
+                .withNameMap(nameMap)
+                .withValueMap(valueMap);
+
+        try {
+            System.out.println("Movies from 1992 - titles A-L, with genres and lead actor");
+            items = table.query(querySpec);
+
+            iterator = items.iterator();
+            while (iterator.hasNext()) {
+                item = iterator.next();
+                System.out.println(item.getNumber("year") + ": " + item.getString("title") + " " + item.getMap("info"));
+            }
+
+        }
+        catch (Exception e) {
+            System.err.println("Unable to query movies from 1992:");
+            System.err.println(e.getMessage());
+        }
+    }
+
+
+    @Deprecated
+    private static void scanItem() {
+        Table table = dynamoDB.getTable("Movies");
+
+        ScanSpec scanSpec = new ScanSpec()
+                .withProjectionExpression("#yr, title, info.rating")
+                .withFilterExpression("#yr between :start_yr and :end_yr")
+                .withNameMap(new NameMap().with("#yr", "year"))
+                .withValueMap(new ValueMap()
+                        .withNumber(":start_yr", 1950)
+                        .withNumber(":end_yr", 1959));
+
+        try {
+            ItemCollection<ScanOutcome> items = table.scan(scanSpec);
+
+            Iterator<Item> iter = items.iterator();
+            while (iter.hasNext()) {
+                Item item = iter.next();
+                System.out.println(item.toString());
+            }
+
+        }
+        catch (Exception e) {
+            System.err.println("Unable to scan the table:");
+            System.err.println(e.getMessage());
+        }
     }
 }
