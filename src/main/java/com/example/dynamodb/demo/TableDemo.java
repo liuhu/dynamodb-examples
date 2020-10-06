@@ -1,13 +1,11 @@
 package com.example.dynamodb.demo;
 
-import com.amazonaws.client.builder.AwsClientBuilder;
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
 import com.amazonaws.services.dynamodbv2.document.*;
 import com.amazonaws.services.dynamodbv2.document.spec.*;
 import com.amazonaws.services.dynamodbv2.document.utils.NameMap;
 import com.amazonaws.services.dynamodbv2.document.utils.ValueMap;
 import com.amazonaws.services.dynamodbv2.model.*;
+import com.example.dynamodb.base.AbstractDemo;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -22,19 +20,8 @@ import java.util.*;
  * @author: LiuHu
  * @create: 2020/10/6
  **/
-public class TableDemo {
+public class TableDemo extends AbstractDemo {
 
-    private static final String tableName = "Movies";
-    private static final DynamoDB dynamoDB;
-
-    static {
-        AwsClientBuilder.EndpointConfiguration endpointConfiguration =
-                new AwsClientBuilder.EndpointConfiguration("http://localhost:18000", "us-west-2");
-        AmazonDynamoDB client = AmazonDynamoDBClientBuilder.standard()
-                .withEndpointConfiguration(endpointConfiguration)
-                .build();
-        dynamoDB = new DynamoDB(client);
-    }
 
     public static void main(String[] args) throws Exception {
 //        createTable();
