@@ -3,6 +3,7 @@ package com.example.dynamodb.mapper.model;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBAttribute;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBHashKey;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTypeConverted;
 
 /**
  * @description:
@@ -18,6 +19,8 @@ public class Book {
     private int pageCount;
     private String productCategory;
     private boolean inPublication;
+
+    private DimensionType dimensionType;
 
     @DynamoDBHashKey(attributeName = "Id")
     public int getId() {
@@ -82,9 +85,32 @@ public class Book {
         this.inPublication = inPublication;
     }
 
+    /**
+     * 转换器
+     * @return
+     */
+    @DynamoDBTypeConverted(converter = DimensionTypeConverter.class)
+    @DynamoDBAttribute(attributeName = "Dimensions")
+    public DimensionType getDimensions() {
+        return dimensionType;
+    }
+
+    @DynamoDBAttribute(attributeName = "Dimensions")
+    public void setDimensions(DimensionType dimensionType) {
+        this.dimensionType = dimensionType;
+    }
+
     @Override
     public String toString() {
-        return "Book [ISBN=" + ISBN + ", price=" + price + ", product category=" + productCategory + ", id=" + id
-                + ", title=" + title + "]";
+        return "Book{" +
+                "id=" + id +
+                ", title='" + title + '\'' +
+                ", ISBN='" + ISBN + '\'' +
+                ", price=" + price +
+                ", pageCount=" + pageCount +
+                ", productCategory='" + productCategory + '\'' +
+                ", inPublication=" + inPublication +
+                ", dimensionType=" + dimensionType +
+                '}';
     }
 }

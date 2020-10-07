@@ -1,4 +1,4 @@
-package com.example.dynamodb.demo;
+package com.example.dynamodb.simple;
 
 import com.amazonaws.services.dynamodbv2.document.*;
 import com.amazonaws.services.dynamodbv2.document.spec.*;

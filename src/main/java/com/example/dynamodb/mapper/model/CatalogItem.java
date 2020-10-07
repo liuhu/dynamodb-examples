@@ -1,9 +1,6 @@
 package com.example.dynamodb.mapper.model;
 
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBAttribute;
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBHashKey;
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBIgnore;
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
+import com.amazonaws.services.dynamodbv2.datamodeling.*;
 
 import java.util.Set;
 
@@ -19,6 +16,7 @@ public class CatalogItem {
     private String ISBN;
     private Set<String> bookAuthors;
     private String someProp;
+    private Long version;
 
     @DynamoDBHashKey(attributeName="Id")
     public Integer getId() { return id; }
@@ -40,6 +38,9 @@ public class CatalogItem {
     public String getSomeProp() { return someProp; }
     public void setSomeProp(String someProp) { this.someProp = someProp; }
 
+    @DynamoDBVersionAttribute
+    public Long getVersion() { return version; }
+    public void setVersion(Long version) { this.version = version;}
 
     @Override
     public String toString() {
@@ -49,6 +50,7 @@ public class CatalogItem {
                 ", ISBN='" + ISBN + '\'' +
                 ", bookAuthors=" + bookAuthors +
                 ", someProp='" + someProp + '\'' +
+                ", version=" + version +
                 '}';
     }
 }
