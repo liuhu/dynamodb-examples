@@ -23,7 +23,7 @@ import java.util.*;
  * @author: LiuHu
  * @create: 2020/10/7
  **/
-@DisplayName("Simple - 基础API")
+@DisplayName("基础API")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class SimpleTest extends AbstractTestBase {
 
