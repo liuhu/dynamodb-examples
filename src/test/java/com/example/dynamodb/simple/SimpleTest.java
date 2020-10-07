@@ -37,7 +37,7 @@ public class SimpleTest extends AbstractTestBase {
     @Test
     @DisplayName("创建表")
     @Order(1)
-    public void create_table_test() {
+    public void createTable() {
         try {
             List<KeySchemaElement> keySchema = Arrays.asList(
                     new KeySchemaElement("year", KeyType.HASH), // Partition
@@ -65,7 +65,7 @@ public class SimpleTest extends AbstractTestBase {
     @Test
     @DisplayName("插入数据")
     @Order(2)
-    public void create_item_test() {
+    public void createItem() {
 
         // 构造数据
         int year = 2015;
@@ -88,7 +88,7 @@ public class SimpleTest extends AbstractTestBase {
     @Test
     @DisplayName("根据主键读取数据")
     @Order(3)
-    public void read_item_by_pk_test() {
+    public void readItemByPk() {
         Table table = dynamoDB.getTable(tableName);
         int year = 2015;
         String title = "The Big New Movie";
@@ -107,7 +107,7 @@ public class SimpleTest extends AbstractTestBase {
     @Test
     @DisplayName("更新数据")
     @Order(4)
-    public void update_item_by_pk_test() {
+    public void updateItemByPk() {
         Table table = dynamoDB.getTable(tableName);
 
         // 构造数据
@@ -143,7 +143,7 @@ public class SimpleTest extends AbstractTestBase {
     @Test
     @DisplayName("更新数据, 原子计数器")
     @Order(5)
-    protected void update_item_atomic_counter_test() {
+    protected void updateItemAtomicCounter() {
         Table table = dynamoDB.getTable(tableName);
 
         int year = 2015;
@@ -169,7 +169,7 @@ public class SimpleTest extends AbstractTestBase {
     @Test
     @DisplayName("更新数据, 带有条件")
     @Order(6)
-    protected void update_item_conditionally_test() {
+    protected void updateItemConditionally() {
         Table table = dynamoDB.getTable(tableName);
 
         int year = 2015;
@@ -196,7 +196,7 @@ public class SimpleTest extends AbstractTestBase {
     @Test
     @DisplayName("删除数据, 带有条件")
     @Order(7)
-    protected void delete_item_conditionally_test() {
+    protected void deleteItemConditionally() {
         Table table = dynamoDB.getTable(tableName);
 
         int year = 2015;
@@ -356,7 +356,7 @@ public class SimpleTest extends AbstractTestBase {
     @Test
     @DisplayName("删除表")
     @Order(Order.DEFAULT)
-    public void delete_table_test() {
+    public void deleteTable() {
         try {
             DeleteTableResult result = dynamoDB.getTable(tableName).delete();
             System.out.println("删除表结果: ");
