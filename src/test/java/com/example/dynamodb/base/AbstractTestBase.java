@@ -9,10 +9,9 @@ import com.amazonaws.services.dynamodbv2.document.DynamoDB;
 /**
  * @description:
  * @author: LiuHu
- * @create: 2020/10/6
+ * @create: 2020/10/7
  **/
-public abstract class AbstractDemo {
-
+public abstract class AbstractTestBase {
     protected static final DynamoDB dynamoDB;
     protected static final DynamoDBMapper mapper;
     protected static final AmazonDynamoDB client;
@@ -26,17 +25,5 @@ public abstract class AbstractDemo {
                 .build();
         dynamoDB = new DynamoDB(client);
         mapper = new DynamoDBMapper(client);
-    }
-
-    public static DynamoDB getDynamoDB() {
-        return dynamoDB;
-    }
-
-    public static DynamoDBMapper getMapper() {
-        return mapper;
-    }
-
-    public static AmazonDynamoDB getClient() {
-        return client;
     }
 }
