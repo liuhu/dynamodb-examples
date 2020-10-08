@@ -5,7 +5,7 @@ import com.amazonaws.services.dynamodbv2.document.spec.*;
 import com.amazonaws.services.dynamodbv2.document.utils.NameMap;
 import com.amazonaws.services.dynamodbv2.document.utils.ValueMap;
 import com.amazonaws.services.dynamodbv2.model.*;
-import com.example.dynamodb.base.AbstractTestBase;
+import com.example.dynamodb.base.AbstractTest;
 import com.example.dynamodb.mapper.model.Movies;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
@@ -25,14 +25,10 @@ import java.util.*;
  **/
 @DisplayName("基础API")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class SimpleTest extends AbstractTestBase {
+public class SimpleTest extends AbstractTest {
 
     private static final String tableName = "Movies";
 
-
-    @BeforeEach
-    void init() {
-    }
 
     @Test
     @DisplayName("创建表")

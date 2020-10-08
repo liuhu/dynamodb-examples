@@ -11,7 +11,7 @@ import com.amazonaws.services.dynamodbv2.document.DynamoDB;
  * @author: LiuHu
  * @create: 2020/10/7
  **/
-public abstract class AbstractTestBase {
+public abstract class AbstractTest {
     protected static final DynamoDB dynamoDB;
     protected static final DynamoDBMapper mapper;
     protected static final AmazonDynamoDB client;

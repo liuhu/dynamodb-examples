@@ -4,7 +4,7 @@ import com.amazonaws.services.dynamodbv2.datamodeling.*;
 import com.amazonaws.services.dynamodbv2.model.InternalServerErrorException;
 import com.amazonaws.services.dynamodbv2.model.ResourceNotFoundException;
 import com.amazonaws.services.dynamodbv2.model.TransactionCanceledException;
-import com.example.dynamodb.base.AbstractDemo;
+import com.example.dynamodb.base.AbstractTest;
 import com.example.dynamodb.mapper.model.Forum;
 import com.example.dynamodb.mapper.model.Thread;
 
@@ -14,10 +14,9 @@ import java.util.List;
 /**
  * @description:
  * @author: LiuHu
- * @create: 2020/10/7
+ * @create: 2020/10/8
  **/
-public class TransactionMapperDemo extends AbstractDemo {
-
+public class TransactionTest extends AbstractTest {
 
     private static void testPutAndUpdateInTransactionWrite() {
         // Create new Forum item for S3 using save
@@ -266,5 +265,4 @@ public class TransactionMapperDemo extends AbstractDemo {
             System.err.println("An exception occurred, investigate and configure retry strategy. Error: " + ex.getMessage());
         }
     }
-
 }

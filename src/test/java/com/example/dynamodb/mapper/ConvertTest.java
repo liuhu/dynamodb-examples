@@ -3,7 +3,7 @@ package com.example.dynamodb.mapper;
 import com.amazonaws.services.dynamodbv2.model.CreateTableRequest;
 import com.amazonaws.services.dynamodbv2.model.ListTablesResult;
 import com.amazonaws.services.dynamodbv2.model.ProvisionedThroughput;
-import com.example.dynamodb.base.AbstractTestBase;
+import com.example.dynamodb.base.AbstractTest;
 import com.example.dynamodb.mapper.model.Book;
 import com.example.dynamodb.mapper.model.DimensionType;
 import org.junit.jupiter.api.*;
@@ -13,7 +13,7 @@ import org.junit.jupiter.api.*;
  * @author: LiuHu
  * @create: 2020/10/8
  **/
-public class ConvertTest extends AbstractTestBase {
+public class ConvertTest extends AbstractTest {
 
 
     @BeforeEach

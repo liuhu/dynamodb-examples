@@ -4,7 +4,7 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapperConfig;
 import com.amazonaws.services.dynamodbv2.model.CreateTableRequest;
 import com.amazonaws.services.dynamodbv2.model.DeleteTableRequest;
 import com.amazonaws.services.dynamodbv2.model.ProvisionedThroughput;
-import com.example.dynamodb.base.AbstractTestBase;
+import com.example.dynamodb.base.AbstractTest;
 import com.example.dynamodb.mapper.model.CatalogItem;
 import org.junit.jupiter.api.*;
 
@@ -18,7 +18,7 @@ import java.util.HashSet;
  **/
 @DisplayName("高级API")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class CrudTest extends AbstractTestBase {
+public class CrudTest extends AbstractTest {
 
 
     @Test

@@ -11,7 +11,7 @@ import java.util.List;
  * @author: LiuHu
  * @create: 2020/10/6
  **/
-@DynamoDBTable(tableName = "ProductCatalog")
+@DynamoDBTable(tableName = "Bicycle")
 public class Bicycle {
     private int id;
     private String title;

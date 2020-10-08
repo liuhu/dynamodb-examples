@@ -10,7 +10,7 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTypeConverted;
  * @author: LiuHu
  * @create: 2020/10/6
  **/
-@DynamoDBTable(tableName = "ProductCatalog")
+@DynamoDBTable(tableName = "Book")
 public class Book {
     private int id;
     private String title;
