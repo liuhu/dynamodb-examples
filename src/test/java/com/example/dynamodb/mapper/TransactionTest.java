@@ -1,12 +1,14 @@
 package com.example.dynamodb.mapper;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.*;
-import com.amazonaws.services.dynamodbv2.model.InternalServerErrorException;
-import com.amazonaws.services.dynamodbv2.model.ResourceNotFoundException;
-import com.amazonaws.services.dynamodbv2.model.TransactionCanceledException;
+import com.amazonaws.services.dynamodbv2.model.*;
 import com.example.dynamodb.base.AbstractTest;
-import com.example.dynamodb.mapper.model.Forum;
+import com.example.dynamodb.mapper.model.*;
 import com.example.dynamodb.mapper.model.Thread;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,22 +18,50 @@ import java.util.List;
  * @author: LiuHu
  * @create: 2020/10/8
  **/
+@DisplayName("事务")
 public class TransactionTest extends AbstractTest {
 
-    private static void testPutAndUpdateInTransactionWrite() {
-        // Create new Forum item for S3 using save
+    @BeforeAll
+    public static void init() {
+        // 创建 Thread 表
+        CreateTableRequest createThreadTable = mapper.generateCreateTableRequest(Thread.class);
+        createThreadTable.setProvisionedThroughput(new ProvisionedThroughput(5L,5L));
+        try {
+            dynamoDB.createTable(createThreadTable);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+
+        CreateTableRequest createForumTable = mapper.generateCreateTableRequest(Forum.class);
+        createForumTable.setProvisionedThroughput(new ProvisionedThroughput(5L,5L));
+        try {
+            dynamoDB.createTable(createForumTable);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    @Test
+    @DisplayName("TransactionWriteRequest - Update & Put")
+    @Order(1)
+    public void testPutAndUpdateInTransactionWrite() {
+        // 准备初始数据
         Forum s3Forum = new Forum();
         s3Forum.setName("S3 Forum");
         s3Forum.setCategory("Core Amazon Web Services");
         s3Forum.setThreads(0);
         mapper.save(s3Forum);
 
-        // Update Forum item for S3 and Create new Forum item for DynamoDB using transactionWrite
+        // 更新 s3 Forum
         s3Forum.setCategory("Amazon Web Services");
+
+        // 创建 dynamodb Forum
         Forum dynamodbForum = new Forum();
-        dynamodbForum.setName("DynamoDB Forum");
+        dynamodbForum.setName("DynamoDB Forum1");
         dynamodbForum.setCategory("Amazon Web Services");
         dynamodbForum.setThreads(0);
+
+        // 构建事务请求
         TransactionWriteRequest transactionWriteRequest = new TransactionWriteRequest();
         transactionWriteRequest.addUpdate(s3Forum);
         transactionWriteRequest.addPut(dynamodbForum);
@@ -39,7 +69,18 @@ public class TransactionTest extends AbstractTest {
     }
 
 
-    private static void testPutWithConditionalUpdateInTransactionWrite() {
+    @Test
+    @DisplayName("TransactionWriteRequest - Put & Update with condition")
+    @Order(2)
+    public void testPutWithConditionalUpdateInTransactionWrite() {
+        // 准备初始数据
+        Forum dynamodbForum = new Forum();
+        dynamodbForum.setName("DynamoDB Forum");
+        dynamodbForum.setCategory("Amazon Web Services");
+        dynamodbForum.setThreads(0);
+        mapper.save(dynamodbForum);
+
+
         // Create new Thread item for DynamoDB forum and update thread count in DynamoDB forum
         // if the DynamoDB Forum exists
         Thread dynamodbForumThread = new Thread();
@@ -47,22 +88,24 @@ public class TransactionTest extends AbstractTest {
         dynamodbForumThread.setSubject("Sample Subject 1");
         dynamodbForumThread.setMessage("Sample Question 1");
 
-        Forum dynamodbForum = new Forum();
-        dynamodbForum.setName("DynamoDB Forum");
-        dynamodbForum.setCategory("Amazon Web Services");
-        dynamodbForum.setThreads(1);
+        Forum newDynamodbForum = new Forum();
+        newDynamodbForum.setName("DynamoDB Forum");
+        newDynamodbForum.setCategory("Amazon Web Services");
+        newDynamodbForum.setThreads(1);
 
         DynamoDBTransactionWriteExpression transactionWriteExpression = new DynamoDBTransactionWriteExpression()
                 .withConditionExpression("attribute_exists(Category)");
 
         TransactionWriteRequest transactionWriteRequest = new TransactionWriteRequest();
         transactionWriteRequest.addPut(dynamodbForumThread);
-        transactionWriteRequest.addUpdate(dynamodbForum, transactionWriteExpression);
+        transactionWriteRequest.addUpdate(newDynamodbForum, transactionWriteExpression);
         executeTransactionWrite(transactionWriteRequest);
     }
 
-
-    private static void testTransactionLoadWithSave() {
+    @Test
+    @DisplayName("TransactionLoadRequest - Load with Projection")
+    @Order(3)
+    public void testTransactionLoadWithSave() {
         // Create new Forum item for DynamoDB using save
         Forum dynamodbForum = new Forum();
         dynamodbForum.setName("DynamoDB Forum");
@@ -97,17 +140,19 @@ public class TransactionTest extends AbstractTest {
         // added to TransactionLoadRequest
         List<Object> loadedObjects = executeTransactionLoad(transactionLoadRequest);
         Forum loadedDynamoDBForum = (Forum) loadedObjects.get(0);
-        System.out.println("Forum: " + loadedDynamoDBForum.getName());
-        System.out.println("Threads: " + loadedDynamoDBForum.getThreads());
+        System.out.println("Load(0) - Forum.Name: " + loadedDynamoDBForum.getName());
+        System.out.println("Load(0) - Forum.Threads: " + loadedDynamoDBForum.getThreads());
+        System.out.println();
         Thread loadedDynamodbForumThread = (Thread) loadedObjects.get(1);
-        System.out.println("Subject: " + loadedDynamodbForumThread.getSubject());
-        System.out.println("Message: " + loadedDynamodbForumThread.getMessage());
+        System.out.println("Load(1) - Thread.Subject: " + loadedDynamodbForumThread.getSubject());
+        System.out.println("Load(1) - Thread.Message: " + loadedDynamodbForumThread.getMessage());
     }
 
-    /**
-     *
-     */
-    private static void testTransactionLoadWithTransactionWrite() {
+
+    @Test
+    @DisplayName("TransactionWriteRequest & TransactionLoadRequest")
+    @Order(4)
+    public void testTransactionLoadWithTransactionWrite() {
         // Create new Forum item for DynamoDB using save
         Forum dynamodbForum = new Forum();
         dynamodbForum.setName("DynamoDB Forum");
@@ -146,17 +191,21 @@ public class TransactionTest extends AbstractTest {
         // added to TransactionLoadRequest
         List<Object> loadedObjects = executeTransactionLoad(transactionLoadRequest);
         Forum loadedDynamoDBForum = (Forum) loadedObjects.get(0);
-        System.out.println("Forum: " + loadedDynamoDBForum.getName());
-        System.out.println("Threads: " + loadedDynamoDBForum.getThreads());
+        System.out.println("Load(0) - Forum.Name: " + loadedDynamoDBForum.getName());
+        System.out.println("Load(0) - Forum.Threads: " + loadedDynamoDBForum.getThreads());
+        System.out.println();
         Thread loadedDynamodbForumThread = (Thread) loadedObjects.get(1);
-        System.out.println("Subject: " + loadedDynamodbForumThread.getSubject());
-        System.out.println("Message: " + loadedDynamodbForumThread.getMessage());
+        System.out.println("Load(1) - Thread.Subject: " + loadedDynamodbForumThread.getSubject());
+        System.out.println("Load(1) - Thread.Message: " + loadedDynamodbForumThread.getMessage());
     }
 
     /**
      * 写事务，增加事务 Condition 检查
      */
-    private static void testPutWithConditionCheckInTransactionWrite() {
+    @Test
+    @DisplayName("TransactionWriteRequest - Put & ConditionCheck & Update")
+    @Order(5)
+    public void testPutWithConditionCheckInTransactionWrite() {
         // Create new Thread item for DynamoDB forum and update thread count in DynamoDB forum if a thread already exists
         Thread dynamodbForumThread2 = new Thread();
         dynamodbForumThread2.setForumName("DynamoDB Forum");
@@ -189,7 +238,10 @@ public class TransactionTest extends AbstractTest {
      * 4. 检查 "Sample Subject 2" 论坛主题是否存在
      * 5. 更新 "DynamoDB" 论坛，"Amazon Web Services" 主题个数为 1
      */
-    private static void testMixedOperationsInTransactionWrite() {
+    @Test
+    @DisplayName("TransactionWriteRequest - Put & ConditionCheck & Update")
+    @Order(6)
+    public void testMixedOperationsInTransactionWrite() {
         // Create new Thread item for S3 forum and delete "Sample Subject 1" Thread from DynamoDB forum if
         // "Sample Subject 2" Thread exists in DynamoDB forum
         Thread s3ForumThread = new Thread();
@@ -229,10 +281,7 @@ public class TransactionTest extends AbstractTest {
     }
 
 
-
-
-
-    private static List<Object> executeTransactionLoad(TransactionLoadRequest transactionLoadRequest) {
+    private List<Object> executeTransactionLoad(TransactionLoadRequest transactionLoadRequest) {
         List<Object> loadedObjects = new ArrayList<>();
         try {
             loadedObjects = mapper.transactionLoad(transactionLoadRequest);

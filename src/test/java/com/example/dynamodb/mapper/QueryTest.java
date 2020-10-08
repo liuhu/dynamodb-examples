@@ -56,7 +56,7 @@ public class QueryTest extends AbstractTest {
         }
     }
 
-    @AfterAll
+    //@AfterAll
     public static void destroy() {
         try {
             DeleteTableRequest deleteTableRequest = mapper.generateDeleteTableRequest(Reply.class);
