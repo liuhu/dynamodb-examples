@@ -27,7 +27,7 @@
 | | | | | | |____PutAndUpdateTest.java
 | | | | | |____simple                       -- 基础 API 的测试用例
 | | | | | | |____SimpleTest.java
-| | | | | |____base                         -- 封装了
+| | | | | |____base                         -- 测试基类，封装了 DynamoDB 连接信息
 | | | | | | |____AbstractTest.java    
 |____main
 | |____resources
